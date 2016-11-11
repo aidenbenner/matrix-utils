@@ -13,6 +13,7 @@ var testMatrix = [
 function solveFromBox(){
   console.log(textField.value);
   var matrix = matrixStringtoMatr(textField.value.split("\n"));
+  console.log(matrix);
   gaussianElim(matrix);
   console.log(matrix);
 }
@@ -25,7 +26,7 @@ function matrixStringtoMatr(eqnStrArr){
 
   var matrix = [];
   for(var i = 0; i<rows; i++){
-    var colStrs = eqnStrArr[0].split(",");
+    var colStrs = eqnStrArr[i].split(",");
     var rowCol = [];
     for(var k = 0; k<colStrs.length;k++){
       rowCol.push(parseFloat(colStrs[k]));;
