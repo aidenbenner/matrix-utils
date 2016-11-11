@@ -1,6 +1,6 @@
 
-var submitButton = document.querySelector("button");
-submitButton.textContent = "tEST";
+var submitButton = document.querySelector("#reduce-btn");
+var detButton= document.querySelector("#det-btn");
 var textField = document.querySelector("#matrix-text");
 var testMatrix = [
   [2,3,7,3],
@@ -8,17 +8,27 @@ var testMatrix = [
   [7,4,9,1],
   [7,4,9,1],
   [7,4,9,1],
-    ];
+];
+
 
 function solveFromBox(){
+  solveFromBox(false);
+}
+function solveFromBox(getDet){
   console.log(textField.value);
   var matrix = matrixStringtoMatr(textField.value.split("\n"));
   console.log(matrix);
-  gaussianElim(matrix);
-  console.log(matrix);
+  var det = gaussianElim(matrix,true);
+  if(getDet)
+    console.log(det);
+  else
+    console.log(matrix);
 }
 
 submitButton.onclick =  solveFromBox;
+detButton.onclick = function(){
+  solveFromBox(true);
+};
 
 function matrixStringtoMatr(eqnStrArr){
   var rows = eqnStrArr.length;
@@ -58,20 +68,28 @@ function interchange(matrix, rowA,rowB){
 }
 
 //[rows][cols]
-function gaussianElim(matrix) {
+function gaussianElim(matrix){
+  gaussianElim(matrix,false);
+}
+function gaussianElim(matrix, findDet) {
   var cols = matrix[0].length;
   var rows = matrix.length;
   var pivotInd = 0; 
+  var det = 1; 
   for(var i = 0; i<cols; i++){
     //reduce each column so we only have 1 as a pivot and all zeroes
     for(var k = pivotInd; k<rows; k++){
       if(matrix[k][i] != 0){
         //we found a non zero value in this column.
         //swap it to the row of the pivot we're working on 
-        interchange(matrix, pivotInd, k);
+        if(pivotInd != k){ 
+          interchange(matrix, pivotInd, k);
+          det = det * -1;
+        }
         //reduce this row to 1 
         var leadingVal = matrix[pivotInd][k];
         rowMult(matrix, pivotInd, 1/leadingVal);
+        det = det * leadingVal;
 
         //now elminate values in other rows
         for(var z = 0; z<rows; z++){
@@ -85,6 +103,9 @@ function gaussianElim(matrix) {
         break;
       }
     }
+  }
+  if(findDet){
+    return det;
   }
 }
 
