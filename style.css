@@ -1,15 +1,18 @@
 body {
   font-family: 'Share Tech Mono', monospace;
+  background-color:#EEEEEE;
 }
 
 .explanation {
   text-align:center; 
 }
 
-.user-input {
-  text-align:center;
+button {
+  background-color:#DDDDDD;
+  border:none;
+  height:3em;
 }
 
-.output {
+.user-input {
   text-align:center;
 }

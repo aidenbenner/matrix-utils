@@ -1,7 +1,7 @@
-
 var submitButton = document.querySelector("#reduce-btn");
 var detButton= document.querySelector("#det-btn");
 var invButton= document.querySelector("#inv-btn");
+var solveButton= document.querySelector("#solve-btn");
 var textField = document.querySelector("#matrix-text");
 var answerText= document.querySelector("#answer-text");
 
@@ -13,14 +13,16 @@ var testMatrix = [
   [7,4,9,1],
 ];
 
+var precision = 5; 
 function matrixToLatex(matrix){
   var str = "\\begin{bmatrix} ";
   for(var i = 0; i<matrix.length; i++){
     for(var k = 0; k<matrix[i].length;k++){
+      var val = Math.round(Math.pow(10,precision) * matrix[i][k]) / Math.pow(10,precision); 
       if(k == matrix[i].length-1)
-        str += matrix[i][k] + " "; 
+        str += val + " "; 
       else
-        str += matrix[i][k] + " & "; 
+        str += val + " & "; 
     }
     if(i != matrix.length - 1)
       str += "\\\\ ";
@@ -34,15 +36,21 @@ function displayMatrix(matrix){
   MathJax.Hub.Typeset();
 }
 
-function displayMatrixEquation(matrix, matrixB){
+function displayMatrixEquation(matrix, matrixB, message){
   var matr1 = matrixToLatex(matrix);
   var matr2 = matrixToLatex(matrixB);
-  var eroEqn = "  \\longrightarrow ";
+
+  var msg = ""; 
+  if(message != undefined){
+    msg = message;
+  }
+
+  var eroEqn = " \\xrightarrow{" + msg + "} ";
   answerText.textContent = "$$" + matr1 + eroEqn + matr2 + " $$";
   MathJax.Hub.Typeset();
 }
 
-function displayDetEquation(matrix, det){
+function displayDetEquation(matrix, det, message){
   var matr1 = "det " + matrixToLatex(matrix);
   answerText.textContent = "$$" + matr1 + " = " + det + " $$";
   MathJax.Hub.Typeset();
@@ -61,7 +69,7 @@ function solveFromBox(getDet){
   solveFromBox(getDet, false);
 }
 
-function solveFromBox(getDet,getInv){
+function solveFromBox(getDet,getInv,solveAug){
   var matrix = matrixStringtoMatr(textField.value.split("\n"));
   var matrixCopy = JSON.parse(JSON.stringify(matrix));
   var inv; 
@@ -71,25 +79,43 @@ function solveFromBox(getDet,getInv){
       displayNotInvertible(matrixCopy); 
     }
     else{ 
-      displayMatrixEquation(matrixCopy, matrix);
+      displayMatrixEquation(matrixCopy, inv,"inverse");
     }
     console.log(inv);
   }
-  else{
+  else if(solveAug){
+    solveAugmented(matrix);
+    displayMatrixEquation(matrixCopy, matrix);
+  }
+  else if (getDet){
     var det = gaussianElim(matrix,true);
-    if(getDet)
+    inv = gaussianElim(matrix,true,true);
+
+    if(inv == null){
+      displayNotInvertible(matrixCopy); 
+    }
+    else{ 
       displayDetEquation(matrixCopy,det);
-    else
-      displayMatrixEquation(matrixCopy, matrix);
+    }  
   }  
+  else{
+    gaussianElim(matrix);
+    displayMatrixEquation(matrixCopy, matrix);
+  }
 }
 
-submitButton.onclick =  solveFromBox;
+solveFromBox(false,true);
+submitButton.onclick =  function(){
+  solveFromBox(false,false);
+};
 detButton.onclick = function(){
   solveFromBox(true);
 };
 invButton.onclick = function(){
   solveFromBox(false,true);
+};
+solveButton.onclick = function(){
+  solveFromBox(false,false,true);
 };
 
 function matrixStringtoMatr(eqnStrArr){
@@ -100,6 +126,7 @@ function matrixStringtoMatr(eqnStrArr){
   for(var i = 0; i<rows; i++){
     var colStrs = eqnStrArr[i].split(",");
     var rowCol = [];
+    if(colStrs.length != cols) continue;
     for(var k = 0; k<colStrs.length;k++){
       rowCol.push(parseFloat(colStrs[k]));;
     }
@@ -131,11 +158,15 @@ function interchange(matrix, rowA,rowB){
 
 //[rows][cols]
 function gaussianElim(matrix){
-  gaussianElim(matrix, false, false);
+  gaussianElim(matrix, false, false,false);
 }
 
 function gaussianElim(matrix, findDet){
-  gaussianElim(matrix, findDet, false);
+  gaussianElim(matrix, findDet, false,false);
+}
+
+function solveAugmented(matrix){
+  gaussianElim(matrix,false,false,true);
 }
 
 function getIdentity(row, col){
@@ -153,13 +184,18 @@ function getIdentity(row, col){
   return identity;
 }
 
-function gaussianElim(matrix, findDet, findInverse) {
+function gaussianElim(matrix, findDet, findInverse, isAugmented) {
   var cols = matrix[0].length;
+  if(isAugmented != undefined) cols--; 
+  console.log(findDet);
   var rows = matrix.length;
   var pivotInd = 0; 
   var det = 1; 
   var identity;
-  if(findInverse){
+  if(findInverse != false || findDet != false){
+    if(rows != cols){
+      return null;
+    }
     identity = getIdentity(rows,cols);
   }
   for(var i = 0; i<cols; i++){
