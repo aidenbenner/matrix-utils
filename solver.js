@@ -13,19 +13,18 @@ var testMatrix = [
   [7,4,9,1],
 ];
 
-
 function matrixToLatex(matrix){
   var str = "\\begin{bmatrix} ";
-    for(var i = 0; i<matrix.length; i++){
-      for(var k = 0; k<matrix[i].length;k++){
-        if(k == matrix[i].length-1)
-          str += matrix[i][k] + " "; 
-        else
-          str += matrix[i][k] + " & "; 
-      }
-      if(i != matrix.length - 1)
-        str += "\\\\ ";
+  for(var i = 0; i<matrix.length; i++){
+    for(var k = 0; k<matrix[i].length;k++){
+      if(k == matrix[i].length-1)
+        str += matrix[i][k] + " "; 
+      else
+        str += matrix[i][k] + " & "; 
     }
+    if(i != matrix.length - 1)
+      str += "\\\\ ";
+  }
   str += "\\end{bmatrix}";
   return str; 
 }
@@ -43,6 +42,18 @@ function displayMatrixEquation(matrix, matrixB){
   MathJax.Hub.Typeset();
 }
 
+function displayDetEquation(matrix, det){
+  var matr1 = "det " + matrixToLatex(matrix);
+  answerText.textContent = "$$" + matr1 + " = " + det + " $$";
+  MathJax.Hub.Typeset();
+}
+
+function displayNotInvertible(matrix){
+  var matr1 = matrixToLatex(matrix);
+  answerText.textContent = "$$" + matr1 + " $$ is not invertible" + " ";
+  MathJax.Hub.Typeset();
+}
+
 function solveFromBox(){
   solveFromBox(false, false);
 }
@@ -55,20 +66,21 @@ function solveFromBox(getDet,getInv){
   var matrixCopy = JSON.parse(JSON.stringify(matrix));
   var inv; 
   if(getInv){
-    console.log("before");
     inv = gaussianElim(matrix,true,true);
-    displayMatrixEquation(matrixCopy, matrix);
-
+    if(inv == null){
+      displayNotInvertible(matrixCopy); 
+    }
+    else{ 
+      displayMatrixEquation(matrixCopy, matrix);
+    }
     console.log(inv);
-    console.log("after");
   }
   else{
-
     var det = gaussianElim(matrix,true);
     if(getDet)
-      console.log(det);
+      displayDetEquation(matrixCopy,det);
     else
-      console.log(matrix);
+      displayMatrixEquation(matrixCopy, matrix);
   }  
 }
 
@@ -186,6 +198,14 @@ function gaussianElim(matrix, findDet, findInverse) {
       }
     }
   }
+  //multiply det 
+  for(var i = 0; i<cols; i++){
+    for(var k = 0; k<rows; k++){
+      if(i != k) continue;
+      det *= matrix[i][k];
+    }
+  }
+
   if(findInverse){
     if(det == 0){
       return null

@@ -1,0 +1,15 @@
+body {
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.explanation {
+  text-align:center; 
+}
+
+.user-input {
+  text-align:center;
+}
+
+.output {
+  text-align:center;
+}

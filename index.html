@@ -1,19 +1,36 @@
 <!doctype html5>
 <body>
   <head>
+    <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" 
+          rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
-  <p> Enter a matrix of size m x n below in the form </p>
-  <code> a11,a12,a13,...a1n<br>a21,a22,a23,...a2n<br>am1,am2,am3,...amn<br></code>
-  <br>
-  <textarea id="matrix-text" cols="25" rows="7"></textarea> 
-  <br />
-  <button id="reduce-btn" type="button"> Row Reduce </button>
-  <button id="det-btn" type="button"> Find Det</button>
-  <button id="inv-btn" type="button"> Find Inverse</button>
-  <p id="answer-text">
-  </p>
 
+  <div class="explanation">
+    <h1> Matrix Utilities </h1>
+    <p> Enter a matrix of size m x n below in the form </p>
+    <code> a11,a12,a13,...a1n <br>a21,a22,a23,...a2n
+      <br>am1,am2,am3,...amn <br></code>
+    <br>
+  </div>
 
+  <div class="user-input">
+    <textarea id="matrix-text" cols="25" rows="7">5,93,1
+2,9,6
+7,23,267</textarea> 
+    <br/>
+    <button id="reduce-btn" type="button"> Row Reduce </button>
+    <button id="det-btn" type="button"> Find Det</button>
+    <button id="inv-btn" type="button"> Find Inverse</button>
+  </div>
+
+  <div class="output">
+    <p id="answer-text">
+    </p>
+  </div>
+
+  <script type="text/javascript" src="http://livejs.com/live.js"></script>
   <script src="solver.js"></script>
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
 </body>
